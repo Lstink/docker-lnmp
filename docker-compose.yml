@@ -10,6 +10,16 @@ services:
       - "9000"
     cap_add:
       - SYS_PTRACE
+  php-fpm-74:
+    image: php:7.4-fpm-buster
+    container_name: php-fpm-74
+    volumes:
+      - ./html:/var/www/html
+    restart: always
+    expose:
+      - "9000"
+    cap_add:
+      - SYS_PTRACE
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -40,6 +50,9 @@ services:
     container_name: mysql
     ports:
       - "3306:3306"
+    volumes:
+      - "./mysql:/var/lib/mysql"
+      - "./conf/mysql/my.cnf:/etc/mysql/my.cnf"
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=root
