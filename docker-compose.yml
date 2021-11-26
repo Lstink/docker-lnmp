@@ -1,0 +1,45 @@
+version: "3"
+services:
+  php-fpm-72:
+    image: php:7.2-fpm-buster
+    container_name: php-fpm-72
+    volumes:
+      - ./html:/var/www/html
+    restart: always
+    expose:
+      - "9000"
+    cap_add:
+      - SYS_PTRACE
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./conf/nginx:/etc/nginx
+      - ./html:/var/www/html
+      - ./log:/var/log
+    depends_on:
+      - php-fpm-72
+    restart: always
+  redis:
+    image: redis:alpine3.14
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./conf/redis/redis.conf:/etc/redis/redis.conf"
+      - "./conf/redis/data:/data"
+    command: redis-server /etc/redis/redis.conf
+    depends_on:
+      - php-fpm-72
+    restart: always
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
